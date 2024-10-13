@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<h1>Espacios de Trabajo</h1>
+<ul>
+  {% for espacio in espacios %}
+  <li>
+    <a href="{% url 'tableros' espacio.id %}">
+      <strong>{{espacio.nombre}}</strong>
+      <p>Creado por: {{espacio.creador}}</p>
+    </a>
+  </li>
+  <li><a href="{% url 'espacio_detalle' espacio.id %}"><p>Detalle del espacio : {{espacio.nombre}}</p> </a></li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

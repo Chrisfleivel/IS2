@@ -2,8 +2,10 @@
 
 {% block content %}
 <h1>Signin</h1>
+<p>
+    {{error}}
+</p>
 
-{{error}}
 
 <form action='/signin/' method="POST">
     {% csrf_token %}

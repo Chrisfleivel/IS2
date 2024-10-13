@@ -1,0 +1,28 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+{{espacio.nombre}}
+
+{{error}}
+
+<form method="POST">
+  {% csrf_token %}
+  {{form.as_p}}
+
+  <button>
+    Update
+  </button>
+</form>
+
+<form action="{% url 'inactivar_espacio' espacio.id %}" method="POST">
+  {% csrf_token %}
+  <button>
+    Inactivar Espacio
+  </button>
+</form>
+
+
+
+{% endblock %}

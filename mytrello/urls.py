@@ -15,16 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, reverse
+from django.urls import path
 from tasks import views
 
-
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('admin/', admin.site.urls),
     path('signup/', views.signup, name='signup'),
     path('tasks/', views.tasks, name='tasks'),
+    path('tasks_completed/', views.tasks_completed, name='tasks_completed'),
     path('logout/', views.signout, name='logout'),
     path('signin/', views.signin, name='signin'),
-    path('usuarios/<str:username>/', views.user_profile, name='user_profile'),
+    path('create_task/', views.create_task, name='create_task'),
+    path('tasks/<int:task_id>/', views.task_detail, name='task_detail'),
+    path('taks/<int:task_id>/complete/', views.complete_task, name='complete_task'),
+    path('tasks/<int:task_id>/delete/', views.delete_task, name='delete_task'),
+    path('prerfil_usuario/<int:user_id>/', views.perfil_usuario, name='perfil_usuario'),
+    path('espacios/', views.espacios, name='espacios'),
+    path('crear_espacio/', views.crear_espacio, name='crear_espacio'),
+    path('espacio/<int:espacio_id>/', views.tableros, name='tableros'), 
+    path('espacio/<int:espacio_id>/inactivar_espacio/', views.inactivar_espacio, name='inactivar_espacio'),
+    path('espacio/<int:espacio_id>/detalle/', views.espacio_detalle, name='espacio_detalle'),
 ]

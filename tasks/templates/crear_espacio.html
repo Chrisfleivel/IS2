@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Crear Espacio Nuevo de Trabajo</h1>
+
+{{error}}
+<form action="/crear_espacio/" method="POST">
+  {% csrf_token %}
+  {{form}}
+
+  <button>Save</button>
+</form>
+{% endblock %}
