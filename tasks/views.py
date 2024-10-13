@@ -106,6 +106,23 @@ def task_detail(request, task_id):
             return render(request, 'task_detail.html', {'task': task, 'form': form, 'error': 'Error updating task.'})
 
 @login_required
+def espacio_detalle(request, espacio_id):
+    '''Permite a los usuario la gestion de los espacios de trabajos'''
+    if request.method == 'GET':
+        espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+        form = EspacioDeTrabajoForm(instance=espacio)
+        return render(request, 'espacios_detalle.html', {'espacio': espacio, 'form': form})
+    else:
+        try:
+            espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+            form = EspacioDeTrabajoForm(request.POST, instance=espacio)
+            form.save()
+            return redirect('espacios')
+        except ValueError:
+            return render(request, 'espacios_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.'})
+
+
+@login_required
 def complete_task(request, task_id):
     task = get_object_or_404(Task, pk=task_id, user=request.user)
     if request.method == 'POST':
@@ -137,21 +154,6 @@ def editar_perfil(request):
         # ...
         pass
 
-@login_required
-def espacio_detalle(request, espacio_id):
-    '''Permite a los usuario la gestion de los espacios de trabajos'''
-    if request.method == 'GET':
-        espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
-        form = EspacioDeTrabajoForm(instance=espacio)
-        return render(request, 'espacios_detalle.html', {'espacio': espacio, 'form': form})
-    else:
-        try:
-            espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, umiembros=request.user)
-            form = EspacioDeTrabajoForm(instance=espacio)
-            form.save()
-            return redirect('espacios')
-        except ValueError:
-            return render(request, 'espacios_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.'})
 
 @login_required
 def tableros(request, espacio_id):
@@ -165,7 +167,8 @@ def tableros(request, espacio_id):
 def espacios(request):
     '''Brinda al usuario los espacios de trabajo en que es parte de los miembros '''
     espacios = EspacioDeTrabajo.objects.filter(miembros = request.user)
-    return render(request, 'espacios.html', {"espacios": espacios})
+    user = request.user
+    return render(request, 'espacios.html', {"espacios": espacios, 'user': user})
             
 @login_required
 def crear_espacio(request):

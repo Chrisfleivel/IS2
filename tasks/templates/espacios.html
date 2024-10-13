@@ -1,18 +1,47 @@
-{% extends 'base.html' %}
 
+{% extends 'base.html' %}
 
 {% block content %}
 <h1>Espacios de Trabajo</h1>
-<ul>
-  {% for espacio in espacios %}
-  <li>
-    <a href="{% url 'tableros' espacio.id %}">
-      <strong>{{espacio.nombre}}</strong>
-      <p>Creado por: {{espacio.creador}}</p>
-    </a>
-  </li>
-  <li><a href="{% url 'espacio_detalle' espacio.id %}"><p>Detalle del espacio : {{espacio.nombre}}</p> </a></li>
-  {% endfor %}
-</ul>
+
+<div class="espacios-activos">
+    <h2>Espacios Activos</h2>
+    <div class="row">
+        {% for espacio in espacios %}
+            {% if espacio.activo %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{espacio.nombre}}</h5>
+                            <p class="card-text">Creado por: {{espacio.creador}}</p>
+                            <a href="{% url 'tableros' espacio.id %}" class="card-link">Ir a tableros</a>
+                            <a href="{% url 'espacio_detalle' espacio.id %}" class="card-link">Detalles</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="espacios-inactivos">
+    <h2>Espacios Inactivos</h2>
+    <div class="row">
+        {% for espacio in espacios %}
+            {% if not espacio.activo and espacio.creador == user %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{espacio.nombre}}</h5>
+                            <p class="card-text">Creado por: {{espacio.creador}}</p>
+                            <a href="{% url 'tableros' espacio.id %}" class="card-link">Ir a tableros</a>
+                            <a href="{% url 'espacio_detalle' espacio.id %}" class="card-link">Detalles</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
 
 {% endblock %}
