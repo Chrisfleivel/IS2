@@ -6,9 +6,9 @@ from django.db import IntegrityError
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
-from .models import Task, EspacioDeTrabajo, Tablero, Usuario
+from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarea
 
-from .forms import TaskForm, EspacioDeTrabajoForm
+from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm
 from .decorador import miembro_requerido
 # from django.urls import reverse
 
@@ -66,7 +66,6 @@ def home(request):
     '''Paguina de inicio'''
     return render(request, 'home.html')
 
-
 @login_required
 def signout(request):
     '''Cierra la secion del Usuario'''
@@ -88,7 +87,6 @@ def signin(request):
 
         login(request, user)
         return redirect('perfil_usuario', user_id=user.id)
-
 
 @login_required
 def task_detail(request, task_id):
@@ -121,6 +119,24 @@ def espacio_detalle(request, espacio_id):
         except ValueError:
             return render(request, 'espacios_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.'})
 
+@login_required
+def tablero_detalle(request, espacio_id, tablero_id):
+    '''Permite a los usuario la gestion de los espacios de trabajos'''
+    if request.method == 'GET':
+        espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+        tablero = get_object_or_404(Tablero, pk=tablero_id)
+        form = TableroForm(instance=tablero)
+        return render(request, 'tablero_detalle.html', {'espacio': espacio, 'form': form, 'tablero': tablero})
+    else:
+        try:
+            espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+            tablero = get_object_or_404(Tablero, pk=tablero_id)
+            form = TableroForm(request.POST, instance=tablero)
+            form.save()
+            # , tablero_id=tablero.id
+            return redirect('tableros', espacio_id=espacio_id)
+        except ValueError:
+            return render(request, 'espacios_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.', 'tablero': tablero})
 
 @login_required
 def complete_task(request, task_id):
@@ -153,15 +169,61 @@ def editar_perfil(request):
         # Mostrar el formulario de edición
         # ...
         pass
-
-
+     
 @login_required
 def tableros(request, espacio_id):
     '''Inicia los tableros que posee el espacio de trabajo. 
     Solo pueden ingresar los miembros del espacio de trabajo'''
-    espacio = EspacioDeTrabajo.objects.filter(id=espacio_id)
-    tableros = Tablero.objects.filter(espacio_trabajo =espacio_id)
-    return render(request, 'tableros.html', {"espacio": espacio, "tableros":tableros})
+    espacio = get_object_or_404(EspacioDeTrabajo, id=espacio_id)
+    tableros = Tablero.objects.filter(espacio_trabajo = espacio)
+    return render(request, 'tableros.html', {"tableros": tableros, "espacio": espacio})
+
+@login_required
+def eliminar_tablero(request, espacio_id, tablero_id):
+    tablero = get_object_or_404(Tablero, pk=tablero_id)
+    if request.method == 'POST':
+        tablero.delete()
+        return redirect('tableros', espacio_id=espacio_id)
+    else:
+        # Mostrar un mensaje de error o redirigir a otra página
+        return render(request, 'error.html', {'mensaje': 'No tienes permiso para inactivar este espacio.'})
+    
+
+
+
+@login_required
+def eliminar_lista(request, espacio_id, tablero_id, lista_id):
+    tablero = get_object_or_404(Tablero, pk=tablero_id)
+    lista = get_object_or_404(Lista, pk=lista_id)
+    if request.method == 'POST':
+        tablero.eliminar_lista(lista)
+        lista.delete()
+        return redirect('tableros', espacio_id=espacio_id)
+    
+    
+def listas(request, espacio_id, tablero_id):
+    espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+    tablero = get_object_or_404(Tablero, pk=tablero_id)
+    # Obtener las listas asociadas al tablero
+    listas = tablero.listas.all()  
+    return render(request, 'listas.html', {'tablero': tablero, 'listas': listas, 'espacio': espacio })
+
+def crear_lista(request, espacio_id, tablero_id):
+    espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+    tablero = get_object_or_404(Tablero, id=tablero_id)
+
+    if request.method == 'POST':
+        form = ListaForm(request.POST)
+        if form.is_valid():
+            lista = form.save(commit=False)
+            lista.tablero = tablero
+            lista.save()
+            tablero.agregar_lista(lista) 
+            lista.posicion = tablero.nueva_posicion()
+            lista.save()
+            return redirect('listas', tablero_id=tablero_id, espacio_id=espacio_id)
+    else:
+        return render(request, 'crear_lista.html', {'form': ListaForm, 'tablero': tablero, 'espacio': espacio})
       
 @login_required
 def espacios(request):
@@ -188,10 +250,38 @@ def crear_espacio(request):
             return render(request, 'crear_espacio.html', {"form": EspacioDeTrabajoForm, "error": "Error al crear Espacio de Trabajo."})
 
 @login_required
+def crear_tablero(request, espacio_id):
+    '''Permite a los usuarios Crear Tableros en el Espacio de Trabajo '''
+    espacio = get_object_or_404(EspacioDeTrabajo, id=espacio_id)
+    
+    if request.method == "POST":
+        try:
+            form = TableroForm(request.POST)
+            new_espacio = form.save(commit=False)
+            new_espacio.espacio_trabajo = espacio
+            new_espacio.save()
+            return redirect('tableros', espacio_id=espacio_id)
+        except ValueError:
+            return render(request, 'crear_tablero.html', {"form": TableroForm, "error": "Error al crear Tablero", "espacio": espacio})
+    else: 
+        return render(request, 'crear_tablero.html', {"form": TableroForm, "espacio": espacio})
+      
+@login_required
 def inactivar_espacio(request, espacio_id):
     espacio = get_object_or_404(EspacioDeTrabajo, id=espacio_id)
     if espacio.es_creador(request.user):
         espacio.activo = False
+        espacio.save()
+        return redirect('espacios')  # Redirige a la lista de espacios
+    else:
+        # Mostrar un mensaje de error o redirigir a otra página
+        return render(request, 'error.html', {'mensaje': 'No tienes permiso para inactivar este espacio.'})
+    
+@login_required
+def activar_espacio(request, espacio_id):
+    espacio = get_object_or_404(EspacioDeTrabajo, id=espacio_id)
+    if espacio.es_creador(request.user):
+        espacio.activo = True
         espacio.save()
         return redirect('espacios')  # Redirige a la lista de espacios
     else:

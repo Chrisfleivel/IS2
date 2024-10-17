@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Espacios de Trabajo</h1>
+<h1>Espacios de Trabajos</h1>
 
 <div class="espacios-activos">
     <h2>Espacios Activos</h2>
@@ -14,7 +14,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{espacio.nombre}}</h5>
                             <p class="card-text">Creado por: {{espacio.creador}}</p>
-                            <a href="{% url 'tableros' espacio.id %}" class="card-link">Ir a tableros</a>
+                            <a href="{% url 'tableros' espacio.id %}" class="card-link">Acceder Espacio</a>
                             <a href="{% url 'espacio_detalle' espacio.id %}" class="card-link">Detalles</a>
                         </div>
                     </div>
@@ -34,7 +34,6 @@
                         <div class="card-body">
                             <h5 class="card-title">{{espacio.nombre}}</h5>
                             <p class="card-text">Creado por: {{espacio.creador}}</p>
-                            <a href="{% url 'tableros' espacio.id %}" class="card-link">Ir a tableros</a>
                             <a href="{% url 'espacio_detalle' espacio.id %}" class="card-link">Detalles</a>
                         </div>
                     </div>

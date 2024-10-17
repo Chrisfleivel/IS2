@@ -1,0 +1,10 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Crear Tablero para {{ espacio.nombre }}</h1> {{error}}
+
+<form action="{% url 'crear_tablero' espacio_id=espacio.id %}" method="POST">
+    {% csrf_token %}
+    {{form.as_p}} <button type="submit">Guardar</button> </form>
+{% endblock %}

@@ -1,0 +1,12 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Crear lista para {{ espacio.nombre }}</h1> 
+<p>{{ tablero.nombre }}</p>
+{{error}}
+
+<form action="{% url 'crear_lista' espacio_id=espacio.id tablero_id=tablero.id %}" method="POST">
+    {% csrf_token %}
+    {{form.as_p}} <button type="submit">Guardar</button> </form>
+{% endblock %}

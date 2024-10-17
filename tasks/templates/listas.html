@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Espacio de Trabajo: {{ espacio.nombre }} </h1>
+    <h2>Tablero: {{ tablero.nombre }}</h2>
+
+    <li class="nav-item">
+        <a href="{% url 'crear_lista' espacio_id=espacio.id tablero_id=tablero.id %}">Crear lista</a>
+    </li>
+
+    {% for lista in listas %}
+        <div class="lista">
+            <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
+        </div>
+    {% endfor %}
+{% endblock %}

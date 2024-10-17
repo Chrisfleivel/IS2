@@ -1,22 +1,30 @@
-
 {% extends 'base.html' %}
 
-
 {% block content %}
-<h1>Espacio de Trabajo: </h1>
-<p>{{espacio.nombre}}</p>
-<div>
-  <h1>Tableros:</h1>
-  <ul>
-    {% for tablero in tableros %}
-    <li>
-      <a href="{% url 'tablero' tablero.id %}">
-        <strong>{{tablero.nombre}}</strong>
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-</div>
+<h1>Espacio de Trabajo: {{ espacio.nombre }} </h1>
+<h2>Tableros:</h2>
+<form method="get">
+    <input type="text" name="q" placeholder="Buscar tablero">
+    <button type="submit">Buscar</button>
+</form>
+<li class="nav-item">
+    <a href="{% url 'crear_tablero' espacio.id %}">Crear un tablero nuevo</a>
+</li>
 
+<div class="tableros">
+    {% if tableros %}
+        {% for tablero in tableros %}
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ tablero.nombre }}</h5>
+                        <a href="{% url 'listas' espacio_id=espacio.id tablero_id=tablero.id %}" class="card-link">Acceder tablero</a>
+                        <a href="{% url 'tablero_detalle' espacio_id=espacio.id tablero_id=tablero.id %}" class="card-link">Modificar Tablero</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
 
 {% endblock %}

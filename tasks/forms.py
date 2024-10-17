@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Task, EspacioDeTrabajo
+from .models import Task, EspacioDeTrabajo, Tablero, Lista
 from django import forms
 from django.contrib.auth.models import User
 
@@ -23,25 +23,19 @@ class EspacioDeTrabajoForm(forms.ModelForm):
         self.fields['miembros'].queryset = User.objects.filter(is_active=True)  # Filtrar solo usuarios activos
 
 
-'''
-class EspacioDeTrabajoForm2(ModelForm):
-    class Meta:
-        model = EspacioDeTrabajo
-        fields = ['nombre', 'activo', 'miembros']
-        widgets = {
-            'miembros': forms.CheckboxSelectMultiple(),
-        }
-
 class TableroForm(ModelForm):
     class Meta:
         model = Tablero
         fields = ['nombre']
 
-class ListaTareaForm(ModelForm):
-    class Meta:
-        model = ListaTarea
-        fields = ['nombre']
 
+
+class ListaForm(ModelForm):
+    class Meta:
+        model = Lista
+        fields = ['nombre', 'max_wip']
+
+'''
 class TareaForm(ModelForm):
     class Meta:
         model = Tarea

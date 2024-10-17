@@ -22,7 +22,13 @@
     Inactivar Espacio
   </button>
 </form>
-
-
+{% if not espacio.activo %}
+  <form action="{% url 'activar_espacio' espacio.id %}" method="POST">
+    {% csrf_token %}
+    <button>
+      Activar Espacio
+    </button>
+  </form>
+{% endif %}
 
 {% endblock %}
