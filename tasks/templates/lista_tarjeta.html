@@ -1,0 +1,101 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="kanban-board">
+    {% for lista in listas %}
+    <div class="column">
+        <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
+        <div class="cards">
+            {% for tarjeta in lista.tarjetas %}
+            <div class="card">
+                <div class="card-header">
+                    {{ tarjeta.nombre_actividad }}
+                </div>
+                <div class="card-body">
+                    <p>{{ tarjeta.descripcion }}</p>
+                    </div>
+                <div class="card-footer">
+                    <a href="{% url 'editar_tarjeta' tarjeta.id %}">Editar</a>
+                    <a href="{% url 'eliminar_tarjeta' tarjeta.id %}">Eliminar</a>
+                </div>
+            </div>
+            {% endfor %}
+            <button class="add-card">Agregar tarjeta</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Espacio de Trabajo: {{ espacio.nombre }} </h1>
+    <h2>Tablero: {{ tablero.nombre }}</h2>
+
+    <li class="nav-item">
+        <a href="{% url 'crear_lista' espacio_id=espacio.id tablero_id=tablero.id %}">Crear lista</a>
+    </li>
+
+    {% for lista in listas %}
+    <div class="columna">
+        <li class="nav-item">
+            <a href="{% url 'crear_tarjeta' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Crear tarjeta</a>
+            <a href="{% url 'lista detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Editar Lista</a>
+            <form action="{% url 'mover_derecha' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}" method="POST">
+                {% csrf_token %}
+                <button>
+                  Derecha 
+                </button>
+            </form>
+            <form action="{% url 'mover_izquierda' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}" method="POST">
+                {% csrf_token %}
+                <button>
+                  Izquierda
+                </button>
+            </form>
+        </li>
+        {% if not lista.llena %}
+            <div class="lista_no_llena">
+                <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
+                {% for tarjeta in lista.tarjetas %}
+                <div class="tarjeta">
+                    <p>{{ tarjeta.nombre_actividad }}</p>
+                    <a href="{% url 'crear_tarea' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Crear Tarea</a>
+                    <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Editar tarjeta</a>
+                    
+                    {% for tarea in tarjeta.tareas %}
+                    <div class="tarea">
+                        <p>{{ tarea.titulo }}</p>
+                        <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Editar tarea</a>
+                    </div>
+                    {% endfor %}
+                    
+                </div>
+                {% endfor %}
+            </div>
+        {% else %} 
+            <div class="lista_llena">
+                <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
+                {% for tarjeta in lista.tarjetas %}
+                <div class="tarjeta">
+                    <p>{{ tarjeta.nombre_actividad }}</p>
+                    <a href="{% url 'crear_tarea' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Crear Tarea</a>
+                    <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Editar tarjeta</a>
+                    
+                    {% for tarea in tarjeta.tareas %}
+                    <div class="tarea">
+                        <p>{{ tarea.titulo }}</p>
+                        <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Editar tarea</a>
+                    </div>
+                    {% endfor %}
+                    
+                </div>
+                {% endfor %}
+        {% endif %}
+    </div>   
+    {% endfor %}
+{% endblock %}

@@ -1,16 +1,38 @@
+
 {% extends 'base.html' %}
-
 {% block content %}
-    <h1>Espacio de Trabajo: {{ espacio.nombre }} </h1>
+<h1>Espacio de Trabajo: {{ espacio.nombre }} </h1>
     <h2>Tablero: {{ tablero.nombre }}</h2>
-
-    <li class="nav-item">
-        <a href="{% url 'crear_lista' espacio_id=espacio.id tablero_id=tablero.id %}">Crear lista</a>
-    </li>
-
+    <a href="{% url 'crear_lista' espacio_id=espacio.id tablero_id=tablero.id %}">Crear lista</a>
+   
+<div class="kanban-board">
     {% for lista in listas %}
-        <div class="lista">
-            <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
-        </div>
+    <div class="column">
+        <a  href="{% url 'lista_mover_izquierda' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Izquierda</a>
+        <a href="{% url 'lista_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Editar Lista</a>
+        <a href="{% url 'lista_mover_derecha' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Derecha</a>
+        
+        <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
+        <div class="cards">
+            {% for tarjeta in lista.tarjetas.all %}
+            <div class="card">
+                <div class="card-header">
+                    {{ tarjeta.nombre_actividad }}
+                </div>
+                <div class="card-body">
+                    <p>{{ tarjeta.descripcion }}</p>
+                    </div>
+                <div class="card-footer">
+                    <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjetaid %}">Editar</a>
+
+                </div>
+            </div>
+            {% endfor %}
+
+            <button class="add-card">Agregar tarjeta</button>
+            <a href="{% url 'crear_tarjeta' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Agregar tarjeta</a>
+        </div> 
+    </div>
     {% endfor %}
+</div>
 {% endblock %}

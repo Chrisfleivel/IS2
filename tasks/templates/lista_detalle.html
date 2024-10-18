@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{{espacio.nombre}}
+
+{{tablero.nombre}}
+
+{{error}}
+
+<form method="POST">
+  {% csrf_token %}
+  {{form.as_p}}
+
+  <button>
+    Actualizar
+  </button>
+</form>
+
+<form action="{% url 'eliminar_lista' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}" method="POST">
+  {% csrf_token %}
+  <button>
+    Eliminar Lista
+  </button>
+</form>
+
+{% endblock %}

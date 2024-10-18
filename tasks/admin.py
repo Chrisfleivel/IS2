@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarea
+from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta
 # Administra la pagina del administrador
 
 class TaskAdmin(admin.ModelAdmin):
@@ -16,12 +16,20 @@ class TableroAdmin(admin.ModelAdmin):
 
 class ListaAdmin(admin.ModelAdmin):
     # solo lectura
-    readonly_fields = ("tablero", "numero_tareas", "esta_llena", "posicion", "ultimo", ) 
+    readonly_fields = ("tablero", "numero_tareas", "max_wip", "orden", ) 
+
+
+class TarjetaAdmin(admin.ModelAdmin):
+    # solo lectura
+    readonly_fields = ("lista", "usuario_asignado", "fecha_creacion", ) 
+
+
 
 
 # Registro de los modelos que aparecen en la pagina del administrador
 admin.site.register(Task, TaskAdmin)
 admin.site.register(EspacioDeTrabajo, EspacioAdmin)
 admin.site.register(Tablero, TableroAdmin)
-admin.site.register(Lista)
-admin.site.register(Tarea)
+admin.site.register(Lista, ListaAdmin)
+admin.site.register(Tarjeta, TarjetaAdmin)
+
