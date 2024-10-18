@@ -51,4 +51,7 @@ urlpatterns = [
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/lista_mover_izquierda/', views.lista_mover_izquierda, name='lista_mover_izquierda'),
     
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/crear_tarjeta/', views.crear_tarjeta, name='crear_tarjeta'), 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarjeta_detalle/', views.tarjeta_detalle, name='tarjeta_detalle'), 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/eliminar_tarjeta/', views.eliminar_tarjeta, name='eliminar_tarjeta'), 
+
 ]

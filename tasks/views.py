@@ -293,31 +293,27 @@ def lista_mover_izquierda(request, espacio_id, tablero_id, lista_id):
     
 
 
+
 def crear_tarjeta(request, espacio_id, tablero_id, lista_id):
     espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
     tablero = get_object_or_404(Tablero, id=tablero_id)
     lista = get_object_or_404(Lista, id=lista_id)
-    miembros = espacio.miembros.all()  # Obtener todos los miembros del espacio
 
     if request.method == 'POST':
-        form = TarjetaForm(request.POST)  # No pasar espacio_id al formulario en POST
+        form = TarjetaForm(request.POST) 
         if form.is_valid():
             tarjeta = form.save(commit=False)
             tarjeta.lista = lista 
             tarjeta.save()
-            # Agregar los miembros seleccionados
-            tarjeta.usuario_asignado.add(*form.cleaned_data['usuario_asignado'])
-            #tarjeta.miembros.add(*form.cleaned_data['miembros'])
             lista.agregar_tarjeta(tarjeta) 
             return redirect('listas', tablero_id=tablero_id, espacio_id=espacio_id)
     else:
         form = TarjetaForm()
-        print(form.errors)  # Imprime los errores del formulario en la consola
+        # print(form.errors)  # Imprime los errores del formulario en la consola
 
     # Pasa los miembros al contexto 
-    context = {'form': form, 'tablero': tablero, 'espacio': espacio, 'lista':lista, 'miembros': miembros}
+    context = {'form': form, 'tablero': tablero, 'espacio': espacio, 'lista':lista}
     return render(request, 'crear_tarjeta.html', context)
-
 
 @login_required
 def eliminar_tarjeta(request, espacio_id, tablero_id, lista_id, tarjeta_id):
@@ -330,6 +326,28 @@ def eliminar_tarjeta(request, espacio_id, tablero_id, lista_id, tarjeta_id):
         lista.eliminar_tarjeta(tarjeta)
         tarjeta.delete()
         return redirect('listas', espacio_id=espacio_id, tablero_id=tablero.id)
+
+@login_required
+def tarjeta_detalle(request, espacio_id, tablero_id, lista_id, tarjeta_id):
+    '''Permite a los usuario la gestion de los espacios de trabajos'''
+    if request.method == 'GET':
+        espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+        tablero = get_object_or_404(Tablero, pk=tablero_id)
+        lista = get_object_or_404(Lista, pk=lista_id)
+        tarjeta = get_object_or_404(Tarjeta, pk=tarjeta_id)
+        form = TarjetaForm(instance=tarjeta)
+        return render(request, 'lista_detalle.html', {'espacio': espacio, 'form': form, 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta})
+    else:
+        try:
+            espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
+            tablero = get_object_or_404(Tablero, pk=tablero_id)
+            lista = get_object_or_404(Lista, pk=lista_id)
+            tarjeta = get_object_or_404(Tarjeta, pk=tarjeta_id)
+            form = ListaForm(request.POST, instance=tarjeta)
+            form.save()
+            return redirect('listas', espacio_id=espacio_id, tablero_id=tablero.id)
+        except ValueError:
+            return render(request, 'lista_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.', 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta})
 
       
 

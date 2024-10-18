@@ -55,7 +55,7 @@ class TarjetaForm(ModelForm):
         fields = ['nombre_actividad', 'descripcion', 'fecha_vencimiento', 'usuario_asignado','etiqueta', 'estado']
         readonly_fields = ('lista','fecha_creacion', 'tarjeats') # solo lectura
         widgets = {
-            'usuario_asignado': forms.CheckboxSelectMultiple(),
+            'usuario_asignado': forms.Select(),
         }
 
     def __init__(self, *args, **kwargs):

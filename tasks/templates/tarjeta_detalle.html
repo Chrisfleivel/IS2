@@ -19,10 +19,10 @@
   </button>
 </form>
 
-<form action="{% url 'eliminar_lista' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id%}" method="POST">
+<form action="{% url 'eliminar_tarjeta' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id%}" method="POST">
   {% csrf_token %}
   <button>
-    Eliminar Lista
+    Eliminar Tarjeta
   </button>
 </form>
 
