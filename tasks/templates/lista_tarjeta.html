@@ -1,32 +1,14 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <div class="kanban-board">
-    {% for lista in listas %}
-    <div class="column">
-        <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
-        <div class="cards">
-            {% for tarjeta in lista.tarjetas %}
-            <div class="card">
-                <div class="card-header">
-                    {{ tarjeta.nombre_actividad }}
-                </div>
-                <div class="card-body">
-                    <p>{{ tarjeta.descripcion }}</p>
-                    </div>
-                <div class="card-footer">
-                    <a href="{% url 'editar_tarjeta' tarjeta.id %}">Editar</a>
-                    <a href="{% url 'eliminar_tarjeta' tarjeta.id %}">Eliminar</a>
-                </div>
-            </div>
-            {% endfor %}
-            <button class="add-card">Agregar tarjeta</button>
-        </div>
-    </div>
-    {% endfor %}
+  {% for lista in listas %}
+  <div class="column {% if lista.lleno %}column-full{% endif %}"> {% if lista.lleno %}
+      <div class="alert alert-danger">¡La lista ha alcanzado su límite de WIP!</div>
+    {% endif %}
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}
-
 
 
 

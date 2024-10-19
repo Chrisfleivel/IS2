@@ -16,7 +16,7 @@ class TableroAdmin(admin.ModelAdmin):
 
 class ListaAdmin(admin.ModelAdmin):
     # solo lectura
-    readonly_fields = ("tablero", "numero_tareas", "max_wip", "orden", ) 
+    readonly_fields = ("tablero", "numero_tareas", "max_wip", "orden", "lleno",) 
 
 
 class TarjetaAdmin(admin.ModelAdmin):
