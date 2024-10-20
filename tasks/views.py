@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Tarea
 
-from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm, TarjetaForm, TareaForm
+from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm, TarjetaForm, TareaForm, FiltroTarjetasForm
 from .decorador import miembro_requerido
 # from django.urls import reverse
 
@@ -103,6 +103,7 @@ def crear_espacio(request):
             new_espacio.save()
             # Agregar los miembros seleccionados
             new_espacio.miembros.add(*form.cleaned_data['miembros'])
+            print(new_espacio.miembros.all())
             return redirect('espacios')
         except ValueError:
             return render(request, 'crear_espacio.html', {"form": EspacioDeTrabajoForm, "error": "Error al crear Espacio de Trabajo."})
@@ -204,13 +205,27 @@ def eliminar_tablero(request, espacio_id, tablero_id):
 
 
 
+
+
+
 @login_required
 def listas(request, espacio_id, tablero_id):
     espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
     tablero = get_object_or_404(Tablero, pk=tablero_id)
+
+    if request.method == 'POST':
+        form = FiltroTarjetasForm(request.POST, usuarios=espacio.miembros.all())
+        if form.is_valid():
+            usuario_seleccionado = form.cleaned_data['usuario_asignado']
+            tarjetas_filtro = Tarjeta.objects.filter(usuario_asignado=usuario_seleccionado)
+    else:
+        form = FiltroTarjetasForm(usuarios=espacio.miembros.all())
+        tarjetas_filtro = Tarjeta.objects.all()  # Obtener todas las tarjetas por defecto
+
     # Obtener las listas asociadas al tablero
     listas = tablero.listas.all()  
-    return render(request, 'listas.html', {'espacio': espacio, 'tablero': tablero, 'listas': listas })
+    context = {'espacio': espacio, 'tablero': tablero, 'listas': listas, 'tarjetas_filtro':tarjetas_filtro, 'form':form }
+    return render(request, 'listas.html', context)
 
 @login_required
 def crear_lista(request, espacio_id, tablero_id):
@@ -316,6 +331,7 @@ def crear_tarjeta(request, espacio_id, tablero_id):
     else:
         form = TarjetaForm()
         form.introducir_estados(tablero.listas.all())
+        print(espacio.miembros.all())
         form.introducir_usuarios(espacio.miembros.all())
         # print(form.errors)  # Imprime los errores del formulario en la consola
     context = {'form': form, 'tablero': tablero, 'espacio': espacio}
@@ -342,14 +358,16 @@ def tarjeta_detalle(request, espacio_id, tablero_id, lista_id, tarjeta_id):
         lista = get_object_or_404(Lista, pk=lista_id)
         tarjeta = get_object_or_404(Tarjeta, pk=tarjeta_id)
         form = TarjetaForm(instance=tarjeta)
-        return render(request, 'lista_detalle.html', {'espacio': espacio, 'form': form, 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta})
+        form.introducir_usuarios(espacio.miembros.all())
+        form.introducir_estados(tablero.listas.all())
+        return render(request, 'tarjeta_detalle.html', {'espacio': espacio, 'form': form, 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta})
     else:
         try:
             espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
             tablero = get_object_or_404(Tablero, pk=tablero_id)
             lista = get_object_or_404(Lista, pk=lista_id)
             tarjeta = get_object_or_404(Tarjeta, pk=tarjeta_id)
-            form = ListaForm(request.POST, instance=tarjeta)
+            form = TarjetaForm(request.POST, instance=tarjeta)
             form.save()
             if lista != tarjeta.estado:
                 print("cambio de lista")
@@ -357,7 +375,7 @@ def tarjeta_detalle(request, espacio_id, tablero_id, lista_id, tarjeta_id):
                 tarjeta.estado.agregar_tarjeta(tarjeta)
             return redirect('listas', espacio_id=espacio_id, tablero_id=tablero.id)
         except ValueError:
-            return render(request, 'lista_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.', 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta})
+            return render(request, 'tarjeta_detalle.html', {'espacio': espacio, 'form': form, 'error': 'Error al actualizar Espacio.', 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta})
 
       
 
@@ -409,6 +427,7 @@ def tarea_detalle(request, espacio_id, tablero_id, lista_id, tarjeta_id, tarea_i
         tarjeta = get_object_or_404(Tarjeta, pk=tarjeta_id)
         tarea = get_object_or_404(Tarea, pk=tarea_id)
         form = TareaForm(instance=tarea)
+        form.introducir_usuarios(espacio.miembros.all())
         return render(request, 'tarea_detalle.html', {'espacio': espacio, 'form': form, 'tablero': tablero, 'lista': lista, 'tarjeta':tarjeta, 'tarea':tarea})
     else:
         try:
@@ -429,6 +448,9 @@ def actualizar_estado_tareas():
         if tarea.fecha_vencimiento <= timezone.now().date():
             tarea.atrasada = True
             tarea.save()
+
+
+
 
 
 

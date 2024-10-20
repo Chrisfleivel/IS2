@@ -13,6 +13,7 @@
             <a href="{% url 'crear_tarjeta' espacio_id=espacio.id tablero_id=tablero.id %}">Crear tarjeta</a>
         </div>
     {% endif %}
+    
 </div>
 <div class="kanban-board">
     {% for lista in listas %}
@@ -27,6 +28,7 @@
         <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
         <div class="cards">
             {% for tarjeta in lista.tarjetas.all %}
+            {% if tarjeta in tarjetas_filtro %}
             <div class="card">
                 <div class="card-header">
                     {{ tarjeta.nombre_actividad }}
@@ -46,16 +48,27 @@
                 </div>
                 <div class="card-footer">
                     <div class="boton-crear">
-                        <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id %}">Editar</a>
+                        <a href="{% url 'tarjeta_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id %}">Editar Tarjeta</a>
                     </div>
                     <div class="boton-crear">
                         <a href="{% url 'crear_tarea' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id %}">Agregar Tarea</a>
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
         </div> 
     </div>
     {% endfor %}
 </div>
+
+{% if tablero.listas.all %}
+    <div class="filtro_usuario">
+        <form method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit">Filtrar Usuario</button>
+        </form>
+    </div>
+{% endif %}
 {% endblock %}

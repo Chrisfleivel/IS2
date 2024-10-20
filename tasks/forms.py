@@ -5,6 +5,17 @@ from django.contrib.auth.models import User
 from datetime import date
 
 
+        
+class FiltroTarjetasForm(forms.Form):
+    usuario_asignado = forms.ModelChoiceField(queryset=None, required=False, label="Filtrar por Usuario:")
+
+    def __init__(self, *args, **kwargs):
+        usuarios = kwargs.pop('usuarios', None)
+        super().__init__(*args, **kwargs)
+        if usuarios:
+            self.fields['usuario_asignado'].queryset = usuarios
+
+
 class TaskForm(ModelForm):
     class Meta:
         model = Task
