@@ -124,14 +124,12 @@ class Lista(OrderedModel, models.Model):
         '''Retorna True si el numero de tareas es igual al max wip'''
         return self.lleno
     
-    
 
 class Tarjeta(models.Model):
     nombre_actividad = models.CharField(max_length=255)
-    lista = models.ForeignKey(Lista, on_delete=models.CASCADE, related_name='tareas')
+    estado = models.ForeignKey(Lista, on_delete=models.CASCADE, related_name='tarjeta_estado')
     usuario_asignado = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, choices=[('pendiente', 'Pendiente'), ('en_progreso', 'En Progreso'), ('completado', 'Completado')])
     descripcion = models.TextField(max_length=1000)
     fecha_vencimiento = models.DateField(null=True, blank=True)
     etiqueta = models.CharField(max_length=50, null=True, blank=True)
@@ -145,7 +143,7 @@ class Tarjeta(models.Model):
         self.tareas.add(tarea)
         self.save()
 
-    def eliminar_tarjeta(self, tarea):
+    def eliminar_tarea(self, tarea):
         """Elimina una o más listas y reordena las restantes.
         Args:
             listas (QuerySet): Un QuerySet de objetos Lista a eliminar.
@@ -175,9 +173,9 @@ class Tarea(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_vencimiento = models.DateTimeField(null=True, blank=True)
     important = models.BooleanField(default=False)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    usuario_asignado = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     estado_cerrado = models.BooleanField(default=False)
-
+    atrasada = models.BooleanField(default=False)
     
 
     def __str__(self):

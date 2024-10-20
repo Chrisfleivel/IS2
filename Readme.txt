@@ -3,7 +3,8 @@ requisitos
 Python 3 version 12
 
 pip instal django
-pip install django-ordered-model
+pip install django-ordered-model   (ordenar)
+pip install django-jquery-ui     (calendario)
 
 python manage.py runserver
 

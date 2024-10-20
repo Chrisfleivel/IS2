@@ -21,7 +21,7 @@ class ListaAdmin(admin.ModelAdmin):
 
 class TarjetaAdmin(admin.ModelAdmin):
     # solo lectura
-    readonly_fields = ("lista", "usuario_asignado", "fecha_creacion", ) 
+    readonly_fields = ("usuario_asignado", "fecha_creacion", ) 
 
 
 

@@ -50,8 +50,11 @@ urlpatterns = [
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/lista_mover_derecha/', views.lista_mover_derecha, name='lista_mover_derecha'),
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/lista_mover_izquierda/', views.lista_mover_izquierda, name='lista_mover_izquierda'),
     
-    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/crear_tarjeta/', views.crear_tarjeta, name='crear_tarjeta'), 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/crear_tarjeta/', views.crear_tarjeta, name='crear_tarjeta'), 
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarjeta_detalle/', views.tarjeta_detalle, name='tarjeta_detalle'), 
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/eliminar_tarjeta/', views.eliminar_tarjeta, name='eliminar_tarjeta'), 
 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/crear_tarea/', views.crear_tarea, name='crear_tarea'), 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarea/<int:tarea_id>/tarea_detalle/', views.tarea_detalle, name='tarea_detalle'), 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarea/<int:tarea_id>/eliminar_tarea/', views.eliminar_tarea, name='eliminar_tarea'), 
 ]

@@ -5,7 +5,7 @@
 <p>{{ tablero.nombre }}</p>
 {{error}}
 
-<form action="{% url 'crear_tarjeta' espacio_id=espacio.id tablero_id=tablero.id %}" method="POST">
+<form action="{% url 'crear_tarea' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id %}" method="POST">
     {% csrf_token %}
     {{ form.as_p }} 
     <button type="submit">Guardar</button> </form>
