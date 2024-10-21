@@ -16,6 +16,11 @@ class FiltroTarjetasForm(forms.Form):
             self.fields['usuario_asignado'].queryset = usuarios
 
 
+class FiltroTarjetasEtiquetaForm(forms.Form):
+    etiqueta = forms.CharField(max_length=50, required=False, label="Filtrar por Etiqueta:")
+
+
+
 class TaskForm(ModelForm):
     class Meta:
         model = Task

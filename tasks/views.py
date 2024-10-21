@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Tarea
 
-from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm, TarjetaForm, TareaForm, FiltroTarjetasForm
+from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm, TarjetaForm, TareaForm, FiltroTarjetasForm, FiltroTarjetasEtiquetaForm
 from .decorador import miembro_requerido
 # from django.urls import reverse
 
@@ -212,20 +212,35 @@ def eliminar_tablero(request, espacio_id, tablero_id):
 def listas(request, espacio_id, tablero_id):
     espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
     tablero = get_object_or_404(Tablero, pk=tablero_id)
-
+    tarjetas_filtro = None
+    actualizar_estado_tareas()
     if request.method == 'POST':
-        form = FiltroTarjetasForm(request.POST, usuarios=espacio.miembros.all())
-        if form.is_valid():
-            usuario_seleccionado = form.cleaned_data['usuario_asignado']
-            tarjetas_filtro = Tarjeta.objects.filter(usuario_asignado=usuario_seleccionado)
-    else:
-        form = FiltroTarjetasForm(usuarios=espacio.miembros.all())
-        tarjetas_filtro = Tarjeta.objects.all()  # Obtener todas las tarjetas por defecto
+        print(request.POST)  # Agregar para depuración
+        # Crear instancias de los formularios con prefijos para los nombres
+        form1 = FiltroTarjetasForm(request.POST, usuarios=espacio.miembros.all())
+        form2 = FiltroTarjetasEtiquetaForm(request.POST)
 
+        if form2.is_valid():
+            etiqueta = form2.cleaned_data['etiqueta']
+            tarjetas_filtro2 = Tarjeta.objects.filter(etiqueta=etiqueta)
+        if form1.is_valid():
+            usuario_seleccionado = form1.cleaned_data['usuario_asignado']
+            tarjetas_filtro1 = Tarjeta.objects.filter(usuario_asignado=usuario_seleccionado)
+        if tarjetas_filtro2:
+            tarjetas_filtro = tarjetas_filtro2
+        if tarjetas_filtro1:
+            tarjetas_filtro = tarjetas_filtro1      
+    else:
+        form1 = FiltroTarjetasForm(usuarios=espacio.miembros.all())
+        form2 = FiltroTarjetasEtiquetaForm()
+        tarjetas_filtro = Tarjeta.objects.all()  # Obtener todas las tarjetas por defecto
     # Obtener las listas asociadas al tablero
     listas = tablero.listas.all()  
-    context = {'espacio': espacio, 'tablero': tablero, 'listas': listas, 'tarjetas_filtro':tarjetas_filtro, 'form':form }
+    context = {'espacio': espacio, 'tablero': tablero, 'listas': listas, 'tarjetas_filtro':tarjetas_filtro, 'form_u':form1, 'form_e':form2 }
     return render(request, 'listas.html', context)
+
+
+
 
 @login_required
 def crear_lista(request, espacio_id, tablero_id):
@@ -445,7 +460,10 @@ def tarea_detalle(request, espacio_id, tablero_id, lista_id, tarjeta_id, tarea_i
 def actualizar_estado_tareas():
     tareas = Tarea.objects.all()
     for tarea in tareas:
-        if tarea.fecha_vencimiento <= timezone.now().date():
+        print(tarea.fecha_vencimiento)
+        print(timezone.now())
+        if tarea.fecha_vencimiento <= timezone.now():
+            print("entro")
             tarea.atrasada = True
             tarea.save()
 

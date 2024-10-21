@@ -38,8 +38,11 @@
                     
                     {% for tarea in tarjeta.tareas.all %}
                     
-                    <div class="tarea {% if tarea.atrasada %}atrasada{% endif %}">
+                    <div class="tarea {% if tarea.atrasada %}atrasadas{% endif %}">
                         <p>{{ tarea }}</p>
+                        {% if tarea.atrasada %}
+                        <p class="tarde">la tarea esta atrasada</p>
+                        {% endif %}
                         <div class="boton-crear">
                             <a href="{% url 'tarea_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id tarea_id=tarea.id %}">Editar Tarea</a>
                         </div>
@@ -63,12 +66,25 @@
 </div>
 
 {% if tablero.listas.all %}
-    <div class="filtro_usuario">
-        <form method="POST">
-            {% csrf_token %}
-            {{form.as_p}}
-            <button type="submit">Filtrar Usuario</button>
-        </form>
+  <div class="filtros">
+    <div class="filtro_usuario col col-md-6">
+      <form method="POST" name="form_usuario">
+        {% csrf_token %}
+        {{ form_u.as_p }}
+       
+        <button type="submit">Filtrar Usuario</button>
+      </form>
     </div>
+    <div class="filtro_etiqueta col col-md-6">
+      <form method="POST" name="form_etiqueta">
+        {% csrf_token %}
+        {{ form_e.as_p }}
+    
+        <button type="submit">Filtrar Tarjetas</button>
+      </form>
+    </div>
+    <div class="boton-crear col col-md-12">  <a href="{% url 'listas' espacio_id=espacio.id tablero_id=tablero.id %}" class="card-link">Detener Filtro</a>
+    </div>
+  </div>
 {% endif %}
 {% endblock %}

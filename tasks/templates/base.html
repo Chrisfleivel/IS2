@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
+        .filtros .filtro_usuario,
+        .filtros .filtro_etiqueta {
+        float: left;
+        width: 50%;
+        /* Agrega estilos adicionales como padding y margin */
+        }
         .kanban-board {
         display: flex;
         justify-content: space-between;
@@ -19,14 +25,18 @@
         align-items: center;
         padding: 20px;
         }
+        .tarde {
+        color: red;
+        font-weight: bold;
+        }
 
-        .atrasada {
+        .atrasadas {
         color: red; /* Puedes cambiar el color a tu gusto */
         font-weight: bold;
         }
         
         .tarea {
-        color: rgb(63, 39, 39); /* Puedes cambiar el color a tu gusto */
+        color: rgb(0, 0, 0); /* Puedes cambiar el color a tu gusto */
         font-weight: bold;
         border: 1px solid #000000;
         }
