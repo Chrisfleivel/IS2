@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Tarea
+from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Tarea, Perfil
 from django import forms
 from django.contrib.auth.models import User
 from datetime import date
@@ -89,3 +89,12 @@ class TarjetaForm(ModelForm):
         if fecha_vencimiento < date.today():
             raise forms.ValidationError("La fecha de vencimiento no puede ser anterior a hoy.")
         return fecha_vencimiento
+
+
+class PerfilForm(ModelForm):
+    class Meta:
+        model = Perfil
+        fields = ['fecha_nacimiento', 'nombre_usuario', 'imagen', 'correo']
+
+    
+

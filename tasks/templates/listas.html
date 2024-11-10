@@ -15,16 +15,14 @@
     {% endif %}
     
 </div>
-<div class="kanban-board">
+<div class="kanban-board" data-tablero-id="{{ tablero.id }}">
     {% for lista in listas %}
+    <div class="column-header" data-list-id="{{ lista.orden }}">
     <div class="column {% if lista.lleno %}column-full{% endif %}"> 
         {% if lista.lleno %}
             <div class="alert alert-danger">¡La lista ha alcanzado su límite de WIP!</div>
         {% endif %}
-        <div class="boton-crear"><a  href="{% url 'lista_mover_izquierda' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Izquierda</a></div>
         <div class="boton-crear"><a href="{% url 'lista_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Editar Lista</a></div>
-        <div class="boton-crear"><a href="{% url 'lista_mover_derecha' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id %}">Derecha</a></div>
-
         <h2>{{ lista.nombre }} (WIP: {{ lista.max_wip }})</h2>
         <div class="cards">
             {% for tarjeta in lista.tarjetas.all %}
@@ -40,8 +38,11 @@
                     
                     <div class="tarea {% if tarea.atrasada %}atrasadas{% endif %}">
                         <p>{{ tarea }}</p>
-                        {% if tarea.atrasada %}
-                        <p class="tarde">la tarea esta atrasada</p>
+                        {% if tarea.atrasada and not tarea.estado_cerrado %}
+                            <span class="label label-danger">¡ATRASADA!</span>
+                        {% endif %}
+                        {% if tarea.estado_cerrado %}
+                            <span class="label label-danger">¡Finalizado!</span>
                         {% endif %}
                         <div class="boton-crear">
                             <a href="{% url 'tarea_detalle' espacio_id=espacio.id tablero_id=tablero.id lista_id=lista.id tarjeta_id=tarjeta.id tarea_id=tarea.id %}">Editar Tarea</a>
@@ -61,6 +62,7 @@
             {% endif %}
             {% endfor %}
         </div> 
+    </div>
     </div>
     {% endfor %}
 </div>
@@ -87,4 +89,53 @@
     </div>
   </div>
 {% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+
+<script>
+
+    function getCookie(name) {
+       let cookieValue = null;
+       if (document.cookie && document.cookie !== '') {
+           const cookies = document.cookie.split(';');
+           for (let i = 0; i < cookies.length; i++) {
+               const cookie = cookies[i].trim();
+               if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                   cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                   break;
+               }
+           }
+       }
+       return cookieValue;
+   }
+    Sortable.create(document.querySelector('.kanban-board'), {
+        animation: 150,
+        handle: '.column-header', // Si quieres que se arrastre por un encabezado
+        group: 'shared',
+        onEnd: function (evt) {
+            // Nuevo índice de la lista movida
+            const newIndex = evt.newIndex;
+            console.log('nuevo id', newIndex);
+            console.log('antiguo listId:', evt.item.dataset.listId);
+            const listId = evt.item.dataset.listId;
+            const tableroId = document.querySelector('.kanban-board').dataset.tableroId;
+  
+            // Enviar una solicitud al servidor para actualizar el orden
+            fetch(`/update_list_order/${tableroId}/${listId}/${newIndex}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Function to get the CSRF token from a cookie
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Lista actualizada:', data);
+            })
+            .catch(error => {
+                console.error('Error al actualizar la lista:', error);
+            });
+        }
+    });
+</script>
 {% endblock %}

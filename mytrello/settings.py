@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tasks',
     'ordered_model',
+    'portfolio',
 ]
 
 MIDDLEWARE = [
@@ -49,10 +50,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'mytrello.urls'
 
+# 'DIRS': [BASE_DIR / 'templates'], para tener todos los temple en carpetas dentro.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -105,9 +108,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'es-py'  # Idioma: Español de Paraguay
+TIME_ZONE = 'America/Asuncion'  # Zona horaria: Asunción, Paraguay
 
 USE_I18N = True
 
@@ -118,6 +120,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+#MEDIA_ROOT = BASE_DIR / 'media'
+#MEDIA_URL = '/media/'
+
 LOGIN_URL = '/signin'
 
 # Default primary key field type

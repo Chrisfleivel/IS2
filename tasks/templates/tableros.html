@@ -19,6 +19,7 @@
                         <h5 class="card-title">{{ tablero.nombre }}</h5>
                         <a href="{% url 'listas' espacio_id=espacio.id tablero_id=tablero.id %}" class="card-link">Acceder tablero</a>
                         <a href="{% url 'tablero_detalle' espacio_id=espacio.id tablero_id=tablero.id %}" class="card-link">Modificar Tablero</a>
+                        <a href="{% url 'dashboard' tablero_id=tablero.id %}" class="card-link">Dashboard</a>
                     </div>
                 </div>
             </div>

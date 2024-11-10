@@ -5,10 +5,15 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt 
+from django.shortcuts import render
+from django.db.models import Count
+from datetime import date
 
-from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Tarea
+from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Tarea, Perfil
 
-from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm, TarjetaForm, TareaForm, FiltroTarjetasForm, FiltroTarjetasEtiquetaForm
+from .forms import TaskForm, EspacioDeTrabajoForm, TableroForm, ListaForm, TarjetaForm, TareaForm, FiltroTarjetasForm, FiltroTarjetasEtiquetaForm, PerfilForm
 from .decorador import miembro_requerido
 # from django.urls import reverse
 
@@ -29,6 +34,7 @@ def signup(request):
                     request.POST["username"], password=request.POST["password1"])
                 user.save()
                 login(request, user)
+
                 return redirect('perfil_usuario', user_id=user.id)
             except IntegrityError:
                 return render(request, 'signup.html', {"form": UserCreationForm, "error": "Username already exists."})
@@ -62,12 +68,53 @@ def signout(request):
 
 
 
+@login_required 
+def perfil_usuario(request, user_id):
+    # Verificar si el usuario actual es el que se está consultando
+
+    try:
+        perfil = Perfil.objects.get(user=request.user)
+    except Perfil.DoesNotExist:
+        # Crear el perfil si no existe
+        perfil = Perfil.objects.create(user=request.user, nombre_usuario=request.user.username)
+
+    context = {'perfil': perfil}
+    return render(request, 'perfil.html', context)
  
 @login_required    
-def perfil_usuario(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
-    context = {'usuario': user}
+def perfil_usuario2(request, user_id):
+    user = get_object_or_404(User, pk=request.user.id)
+    try:
+        perfil = get_object_or_404(Perfil, user=user)
+    except IntegrityError:
+        nombre= user.username
+        perfil1= Perfil(user=user, nombre_usuario=nombre)
+        perfil.save()
+        perfil = get_object_or_404(Perfil, user=user)
+    
+    context = {'perfil': perfil}
     return render(request, 'perfil.html', context)
+
+
+
+@login_required
+def perfil_detalle(request, user_id):
+    '''Permite a los usuario la gestion de los espacios de trabajos'''
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == 'GET':
+       
+        perfil = get_object_or_404(Perfil, user=user)
+        form = PerfilForm(instance=perfil)
+        return render(request, 'perfil_detalle.html', {'perfil': perfil, 'form': form})
+    else:
+        try:
+            perfil = get_object_or_404(Perfil, user=user)
+            form = PerfilForm(request.POST, instance=perfil)
+            form.save()
+            return redirect('perfil_usuario', user_id=user_id)     
+        except ValueError:
+            return render(request, 'espacios_detalle.html', {'perfil': perfil, 'form': form, 'error': 'Error al actualizar Espacio.'})
+  
 
 @login_required
 def editar_perfil(request):
@@ -215,7 +262,6 @@ def listas(request, espacio_id, tablero_id):
     tarjetas_filtro = None
     actualizar_estado_tareas()
     if request.method == 'POST':
-        print(request.POST)  # Agregar para depuración
         # Crear instancias de los formularios con prefijos para los nombres
         form1 = FiltroTarjetasForm(request.POST, usuarios=espacio.miembros.all())
         form2 = FiltroTarjetasEtiquetaForm(request.POST)
@@ -295,17 +341,13 @@ def lista_mover_derecha(request, espacio_id, tablero_id, lista_id):
     espacio = get_object_or_404(EspacioDeTrabajo, pk=espacio_id, miembros=request.user)
     tablero = get_object_or_404(Tablero, pk=tablero_id)
     lista1 = get_object_or_404(Lista, pk=lista_id)
-    print("l1:", lista1.orden)
     if request.method == 'GET':
         ultima_lista = tablero.listas.last()
-        print("ultimo", ultima_lista.orden)
         if ultima_lista.orden > lista1.orden:
             for r_lista in tablero.listas.all():
                 if r_lista.orden == (lista1.orden + 1):
                     lista2 = r_lista
-            print("l2:", lista2.orden)
             tablero.cambiar_orden(lista1, lista2)
-
     return redirect('listas', espacio_id=espacio_id, tablero_id=tablero_id)
 
 @login_required
@@ -322,6 +364,44 @@ def lista_mover_izquierda(request, espacio_id, tablero_id, lista_id):
     return redirect('listas', espacio_id=espacio_id, tablero_id=tablero_id)
     
 
+
+
+
+
+@login_required
+def update_list_order(request, tablero_id, list_id, new_index):
+    print("entro actualizar lis")
+    tablero = get_object_or_404(Tablero, pk=tablero_id)
+    print(tablero)
+    if request.method == 'POST':
+        print("entro pos")
+        
+        try:
+            for lista_t in tablero.listas.all():
+                if lista_t.orden == list_id:
+                    lista = lista_t
+            if lista.orden == new_index:
+                return JsonResponse({'message': 'Lista actualizada correctamente', 'success': True})
+            elif lista.orden > new_index:
+                if lista.orden != 0: 
+                    while lista.orden > new_index:
+                        for r_lista in tablero.listas.all():
+                            if r_lista.orden == (lista.orden - 1):
+                                lista2 = r_lista
+                        tablero.cambiar_orden(lista2, lista)
+            else:
+                ultima_lista = tablero.listas.last()
+                if ultima_lista.orden > lista.orden:
+                    while lista.orden < new_index:
+                        for r_lista in tablero.listas.all():
+                            if r_lista.orden == (lista.orden + 1):
+                                lista2 = r_lista
+                        tablero.cambiar_orden(lista, lista2)
+            return JsonResponse({'message': 'Lista actualizada correctamente'})
+        except Lista.DoesNotExist:
+            return JsonResponse({'error': 'Lista no encontrada'}, status=404)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 
@@ -466,6 +546,71 @@ def actualizar_estado_tareas():
             print("entro")
             tarea.atrasada = True
             tarea.save()
+
+
+
+
+@login_required
+def dashboard2(request, tablero_id):
+    tablero = get_object_or_404(Tablero, pk=tablero_id)
+    listas = tablero.listas.all()
+    tarjetas = []
+    tareas = []
+    for lista in listas:
+        for tarjeta in lista.tarjetas.all():
+            tarjetas.append(tarjeta)  
+        for tarjeta in lista.tarjetas.all():
+            for tarea in tarjeta.tareas.all():
+                tareas.append(tarea)   
+    # Datos para los gráficos (ejemplo con Chart.js)
+    datos_estado_tarjeta = tarjetas.values('estado').annotate(total=Count('id'))
+    datos_usuario_tarjeta = tarjetas.values('usuario_asignado').annotate(total=Count('id'))
+    tareas_atrasadas_tarjeta = tarjetas.filter(fecha_vencimiento__lt=date.today())
+
+    datos_estado = tareas.values('estado_cerrado').annotate(total=Count('id'))
+    datos_usuario = tareas.values('usuario_asignado').annotate(total=Count('id'))
+    tareas_atrasadas = tareas.filter(fecha_vencimiento__lt=date.today())
+
+    return render(request, 'dashboard.html', {
+        'tablero': tablero,
+        'datos_estado': datos_estado,
+        'datos_usuario': datos_usuario,
+        'tareas_atrasadas': tareas_atrasadas,
+        'datos_estado_tarjeta': datos_estado_tarjeta,
+        'datos_usuario_tarjeta': datos_usuario_tarjeta,
+        'tareas_atrasadas_tarjeta': tareas_atrasadas_tarjeta,
+    })
+
+
+
+
+def dashboard(request, tablero_id):
+    tablero = get_object_or_404(Tablero, pk=tablero_id)
+
+    # Obtener todas las tarjetas relacionadas con el tablero
+    tarjetas = tablero.listas.all().prefetch_related('tarjetas').values_list('tarjetas', flat=True)
+    print(tarjetas)
+
+    # Obtener todas las tareas de las tarjetas
+    # Obtener todas las tareas relacionadas con el tablero
+    tareas = tablero.listas.all().prefetch_related('tarjetas__tareas').values_list('tarjetas__tareas', flat=True)
+    print(tareas)
+    # Crear un QuerySet de Tarea a partir de los IDs obtenidos
+    tareas_queryset = Tarea.objects.filter(pk__in=tareas)
+
+    # Datos para los gráficos
+    datos_usuario_tarea = tareas_queryset.values('usuario_asignado').annotate(total=Count('id'))
+    tareas_atrasadas = tareas_queryset.filter(fecha_vencimiento__lt=date.today()).count()
+
+    # Datos para el gráfico de estados de tarjeta
+    datos_estado_tarjeta = tarjetas.values('tarjeta_estado').annotate(total=Count('id'))
+
+    return render(request, 'dashboard.html', {
+        'tablero': tablero,
+        'datos_usuario_tarea': datos_usuario_tarea,
+        'tareas_atrasadas': tareas_atrasadas,
+        'datos_estado_tarjeta': datos_estado_tarjeta
+    })
 
 
 

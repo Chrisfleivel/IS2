@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    </head>
+<body>
+    <h1>Dashboard del Tablero: {{ tablero.nombre }}</h1>
+
+    <h2>Tareas por Usuario</h2>
+    <canvas id="myChart"></canvas>
+
+    <h2>Tareas Atrasadas: {{ tareas_atrasadas }}</h2>
+    <h2>Tareas por Estado</h2>
+    <canvas id="myChart_estado"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Configuración del gráfico de Chart.js
+        var ctx = document.getElementById('myChart').getContext('2d');
+        
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for dato in datos_usuario_tarea %} '{{ dato.usuario_asignado }}', {% endfor %}],
+                datasets: [{
+                    label: 'Número de Tareas',
+                    data: [{% for dato in datos_usuario_tarea %} {{ dato.total }}, {% endfor %}],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var ctx2 = document.getElementById('myChart_estado').getContext('2d');
+        
+        var myChart_estado = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: [{% for dato in datos_estado_tarjeta %} '{{ dato.tarjeta_estado }}', {% endfor %}],
+                datasets: [{
+                    label: 'Número de Tarjetas',
+                    data: [{% for dato in datos_estado_tarjeta %} {{ dato.total }}, {% endfor %}],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

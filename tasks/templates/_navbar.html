@@ -25,8 +25,12 @@
           <a href="{% url 'crear_espacio' %}" class="nav-link">Crear Espacio</a>
         </li>
         <li class="nav-item">
+          <a href="{% url 'perfil_usuario' user_id=user.id %}" class="nav-link">Mi Perfil</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="/logout">Cerrar Sesion</a>
         </li>
+        
         {% else %}
         <li class="nav-item">
           <a href="/signin" class="nav-link">Iniciar Sesion</a>

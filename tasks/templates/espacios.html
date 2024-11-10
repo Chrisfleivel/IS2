@@ -35,6 +35,7 @@
                             <h5 class="card-title">{{espacio.nombre}}</h5>
                             <p class="card-text">Creado por: {{espacio.creador}}</p>
                             <a href="{% url 'espacio_detalle' espacio.id %}" class="card-link">Detalles</a>
+                            <a href="{% url 'dashboard' espacio.id %}" class="card-link">Dashboard</a>
                         </div>
                     </div>
                 </div>

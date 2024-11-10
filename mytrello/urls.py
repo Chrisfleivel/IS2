@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from tasks import views
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -30,7 +33,8 @@ urlpatterns = [
     path('tasks/<int:task_id>/', views.task_detail, name='task_detail'),
     path('taks/<int:task_id>/complete/', views.complete_task, name='complete_task'),
     path('tasks/<int:task_id>/delete/', views.delete_task, name='delete_task'),
-    path('prerfil_usuario/<int:user_id>/', views.perfil_usuario, name='perfil_usuario'),
+    path('perfil_usuario/<int:user_id>/', views.perfil_usuario, name='perfil_usuario'),
+    path('perfil_usuario/<int:user_id>/perfil_detalle/', views.perfil_detalle, name='perfil_detalle'),
 
     path('espacios/', views.espacios, name='espacios'),
     path('crear_espacio/', views.crear_espacio, name='crear_espacio'),
@@ -44,6 +48,9 @@ urlpatterns = [
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/eliminar_tablero/', views.eliminar_tablero, name='eliminar_tablero'),
 
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/listas/', views.listas, name='listas'),
+    path('update_list_order/<int:tablero_id>/<int:list_id>/<int:new_index>/', views.update_list_order, name='update_list_order'),
+
+    
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/crear_lista/', views.crear_lista, name='crear_lista'),
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/lista_detalle/', views.lista_detalle, name='lista_detalle'),
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/eliminar_lista/', views.eliminar_lista, name='eliminar_lista'),
@@ -56,5 +63,8 @@ urlpatterns = [
 
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/crear_tarea/', views.crear_tarea, name='crear_tarea'), 
     path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarea/<int:tarea_id>/tarea_detalle/', views.tarea_detalle, name='tarea_detalle'), 
-    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarea/<int:tarea_id>/eliminar_tarea/', views.eliminar_tarea, name='eliminar_tarea'), 
+    path('espacio/<int:espacio_id>/tablero/<int:tablero_id>/lista/<int:lista_id>/tarjeta/<int:tarjeta_id>/tarea/<int:tarea_id>/eliminar_tarea/', views.eliminar_tarea, name='eliminar_tarea'),
+
+    path('espacio/tablero/<int:tablero_id>/lista/dashboard/', views.dashboard, name='dashboard'),  
 ]
+# + staticfiles_urlpatterns()

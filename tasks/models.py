@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.fields import URLField
+from django.db.models.fields.files import ImageField
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
@@ -176,6 +178,7 @@ class Tarea(models.Model):
     usuario_asignado = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     estado_cerrado = models.BooleanField(default=False)
     atrasada = models.BooleanField(default=False)
+
     
 
     def __str__(self):
@@ -197,6 +200,24 @@ class Usuario(models.Model):
 
     def quitar_espacio(self, espacio):
         self.espacios.remove(espacio)
+
+    def __str__(self):
+        return self.user.username
+    
+
+class Perfil(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
+    espacios = models.ManyToManyField('EspacioDeTrabajo', related_name='perfil_espacio')
+    nombre_usuario = models.CharField(max_length=200)
+    imagen = ImageField(upload_to="perfiles/images/", default='usuario_default.jpg')
+    correo = models.CharField(max_length=200)
+    #image = models.ImageField(upload_to='profile_pics', default='usuario_default.jpg')
+    # url = URLField(blank=True)
+    # tareas_pendientes podría ser un campo ManyToManyField para relacionar el perfil con un modelo Tarea
+    # tareas_pendientes = models.ManyToManyField('Tarea', blank=True)
+
 
     def __str__(self):
         return self.user.username

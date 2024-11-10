@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta
+from .models import Task, EspacioDeTrabajo, Tablero, Lista, Tarjeta, Perfil, Tarea
 # Administra la pagina del administrador
 
 class TaskAdmin(admin.ModelAdmin):
@@ -32,4 +32,6 @@ admin.site.register(EspacioDeTrabajo, EspacioAdmin)
 admin.site.register(Tablero, TableroAdmin)
 admin.site.register(Lista, ListaAdmin)
 admin.site.register(Tarjeta, TarjetaAdmin)
+admin.site.register(Perfil)
+admin.site.register(Tarea)
 
