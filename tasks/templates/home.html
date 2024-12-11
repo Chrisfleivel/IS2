@@ -3,6 +3,26 @@
 {% block content %}
 <div class="container">
     <h1>Home</h1>
-    <p> texto explicativo</p>
+    <p> Aplicación web que permita gestionar tareas en un entorno multiusuario.
+      <br>
+      La aplicación permitirá a los usuarios crear sus propios Espacios de Trabajo, que a la vez pueden contener uno o más tableros con tarjetas, cuyo paso por diferentes estados puede ser visualizado y seguido a través de la aplicación web.
+      <br>
+      Algunas definiciones útiles:
+      <br>
+      ● Tarjeta: Representa a una actividad cuya realización será monitoreada mediante la app. Las tarjetas
+      describen una actividad que puede constar de varias Tareas y se asignan a un usuario para su
+      realización. Es importante guardar un registro de las fechas en las que una tarjeta pasa a un nuevo
+      estado o usuario.
+      <br>
+      ● Lista: cada una de las columnas de un tablero, representa un estado de tarjeta. Las tarjetas van
+      moviéndose entre las listas (columnas) según su estado de avance. Las listas más comunes son: To Do
+      (por hacer), In Progress (En progreso) y Done (Finalizado). Cada tablero puede tener tantas Listas
+      (columnas de estado) como sean necesarias.
+      <br>
+      ● Tablero: Un tablero es un conjunto de Tarjetas distribuidas en Listas.
+      <br>
+      ● Espacio de Trabajo: un espacio de trabajo, es un conjunto de tableros. Se asocian a un usuario
+      propietario (el creador, owner) y este puede agregar otros usuarios a sus espacios. Los tableros sólo
+      serán visibles para los miembros del espacio.</p>
   </div>
 {% endblock %}

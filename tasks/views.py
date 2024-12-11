@@ -599,11 +599,11 @@ def dashboard(request, tablero_id):
     tareas_queryset = Tarea.objects.filter(pk__in=tareas)
 
     # Datos para los gráficos
-    datos_usuario_tarea = tareas_queryset.values('usuario_asignado').annotate(total=Count('id'))
+    datos_usuario_tarea = tareas_queryset.values('usuario_asignado').annotate(total=Count('usuario_asignado_id'))
     tareas_atrasadas = tareas_queryset.filter(fecha_vencimiento__lt=date.today()).count()
 
     # Datos para el gráfico de estados de tarjeta
-    datos_estado_tarjeta = tarjetas.values('tarjeta_estado').annotate(total=Count('id'))
+    datos_estado_tarjeta = tarjetas.values('tarjeta_estado').annotate(total=Count('nombre'))
 
     return render(request, 'dashboard.html', {
         'tablero': tablero,
