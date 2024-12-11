@@ -45,6 +45,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+
+        // Lista de colores (ejemplo)
+        const colores = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#FFCD56', '#FF6384', '#36A2EB', '#FFCE56'];
+
         // Configuración del gráfico de Chart.js
         var ctx = document.getElementById('myChart').getContext('2d');
         
@@ -55,7 +59,7 @@
                 datasets: [{
                     label: 'Número de Tareas',
                     data: [{% for dato in datos_usuario_tarea %} {{ dato.total }}, {% endfor %}],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    backgroundColor: colores,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
@@ -78,7 +82,7 @@
                 datasets: [{
                     label: 'Número de Tarjetas',
                     data: [{% for dato in datos_estado_tarjeta %} {{ dato.total }}, {% endfor %}],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    backgroundColor: colores,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
